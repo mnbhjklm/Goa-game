@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rainbow Game</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f6fa;
+    color: #333;
+    min-height: 100vh;
+    padding-bottom: 20px;
+  }
+
+  /* ===== TOP HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .header .logo {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  .header .icons {
+    display: flex;
+    gap: 15px;
+    font-size: 20px;
+  }
+
+  /* ===== WALLET CARD ===== */
+  .wallet-card {
+    background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
+    color: #fff;
+    padding: 0 15px 25px;
+    border-radius: 0 0 25px 25px;
+    text-align: center;
+  }
+  .balance {
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+  }
+  .balance-label {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 18px;
+  }
+  .wallet-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+  }
+  .wallet-btn {
+    flex: 1;
+    max-width: 150px;
+    padding: 12px;
+    border: none;
+    border-radius: 25px;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+  }
+  .withdraw-btn { background: #ff4757; }
+  .deposit-btn { background: #00c853; }
+
+  /* ===== WELCOME BANNER ===== */
+  .welcome {
+    background: #fff;
+    margin: 12px 15px;
+    padding: 12px 15px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .welcome-icon { font-size: 18px; }
+
+  /* ===== GAME TABS ===== */
+  .game-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 15px;
+    margin-bottom: 12px;
+    overflow-x: auto;
+  }
+  .game-tab {
+    flex: 1;
+    min-width: 80px;
+    background: #fff;
+    padding: 12px 8px;
+    border-radius: 12px;
+    text-align: center;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .game-tab.active {
+    background: #4a6cf7;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(74,108,247,0.4);
+  }
+  .game-tab .tab-icon {
+    font-size: 20px;
+    margin-bottom: 4px;
+  }
+  .game-tab .tab-name {
+    font-size: 11px;
+    font-weight: 600;
+  }
+
+  /* ===== TIMER + INFO ===== */
+  .info-row {
+    background: #fff;
+    margin: 0 15px 12px;
+    padding: 15px;
+    border-radius: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .info-left {
+    flex: 1;
+  }
+  .info-title {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 8px;
+  }
+  .last-results {
+    display: flex;
+    gap: 5px;
+  }
+  .result-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .info-right {
+    text-align: right;
+  }
+  .timer-label {
+    font-size: 12px;
+    color: #999;
+    margin-bottom: 4px;
+  }
+  .timer-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    justify-content: flex-end;
+  }
+  .timer-box {
+    background: #f0f2f7;
+    color: #333;
+    font-size: 22px;
+    font-weight: 800;
+    padding: 4px 8px;
+    border-radius: 6px;
+    min-width: 30px;
+    text-align: center;
+  }
+  .timer-sep {
+    font-size: 22px;
+    font-weight: 800;
+    color: #333;
+  }
+
+  /* ===== COLOR BUTTONS ===== */
+  .colors-section {
+    display: flex;
+    gap: 10px;
+    padding: 0 15px;
+    margin-bottom: 15px;
+  }
+  .color-btn {
+    flex: 1;
+    padding: 15px 8px;
+    border-radius: 12px;
+    border: 3px solid transparent;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .color-btn .color-name {
+    font-size: 15px;
+    display: block;
+  }
+  .color-btn .color-mult {
+    font-size: 13px;
+    display: block;
+    margin-top: 3px;
+    opacity: 0.95;
+  }
+  .color-btn.selected {
+    border-color: #fff;
+    box-shadow: 0 0 0 3px #4a6cf7, 0 4px 15px rgba(74,108,247,0.5);
+    transform: translateY(-2px);
+  }
+  .color-green { background: linear-gradient(135deg, #00CC44, #00a035); }
+  .color-violet { background: linear-gradient(135deg, #8B00FF, #6600cc); }
+  .color-red { background: linear-gradient(135deg, #FF0000, #cc0000); }
+
+  /* ===== NUMBER GRID ===== */
+  .numbers-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    padding: 0 15px;
+    margin-bottom: 15px;
+  }
+  .num-btn {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 3px solid transparent;
+    cursor: pointer;
+    color: #fff;
+    font-weight: 800;
+    font-size: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+  }
+  .num-btn.selected {
+    border-color: #4a6cf7;
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #4a6cf7;
+    transform: scale(1.05);
+  }
+  .num-green { background: radial-gradient(circle at 30% 30%, #33ff77, #00a035); }
+  .num-violet { background: radial-gradient(circle at 30% 30%, #bb66ff, #6600cc); }
+  .num-red { background: radial-gradient(circle at 30% 30%, #ff5555, #cc0000); }
+
+  /* ===== BET CHIPS ===== */
+  .chips-section {
+    display: flex;
+    gap: 8px;
+    padding: 0 15px;
+    margin-bottom: 15px;
+  }
+  .chip {
+    flex: 1;
+    padding: 12px 0;
+    background: #fff;
+    border: 2px solid #e0e3eb;
+    border-radius: 25px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .chip.active {
+    background: #4a6cf7;
+    border-color: #4a6cf7;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(74,108,247,0.4);
+  }
+
+  /* ===== PLACE BET BUTTON ===== */
+  .bet-btn-container {
+    padding: 0 15px;
+    margin-bottom: 15px;
+  }
+  .bet-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(90deg, #ff4757, #ff3838);
+    color: #fff;
+    border: none;
+    border-radius: 15px;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(255,71,87,0.4);
+    transition: all 0.2s;
+  }
+  .bet-btn:active { transform: scale(0.98); }
+  .bet-btn:disabled {
+    background: #ccc;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* ===== MESSAGE ===== */
+  .msg-box {
+    text-align: center;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #4a6cf7;
+    min-height: 40px;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #e0e3eb;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  }
+  .nav-item {
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    cursor: pointer;
+    padding: 5px 15px;
+  }
+  .nav-item.active { color: #4a6cf7; }
+  .nav-item .nav-icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.3s;
+    z-index: 999;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #00c853; }
+  .toast.error { background: #ff4757; }
+
+  /* ===== RESULT OVERLAY ===== */
+  .result-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+  .result-overlay.show { display: flex; }
+  .result-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 30px 40px;
+    text-align: center;
+    animation: pop 0.4s ease-out;
+  }
+  @keyframes pop {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .result-card .big-num {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 auto 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+  }
+  .result-card .result-text {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  .result-card .result-sub {
+    font-size: 13px;
+    color: #999;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo">🌈 Rainbow</div>
+  <div class="icons">
+    <span>👤</span>
+    <span onclick="logout()">🚪</span>
+  </div>
+</div>
+
+<!-- WALLET CARD -->
+<div class="wallet-card">
+  <div class="balance" id="balanceDisplay">₹ 0.00</div>
+  <div class="balance-label">💰 Wallet Balance</div>
+  <div class="wallet-actions">
+    <button class="wallet-btn withdraw-btn" onclick="goWallet('withdraw')">Withdraw</button>
+    <button class="wallet-btn deposit-btn" onclick="goWallet('deposit')">Deposit</button>
+  </div>
+</div>
+
+<!-- WELCOME BANNER -->
+<div class="welcome">
+  <span class="welcome-icon">🔊</span>
+  <span>Welcome to Rainbow game platform, play and win big!</span>
+</div>
+
+<!-- GAME TABS -->
+<div class="game-tabs">
+  <div class="game-tab active" onclick="selectDuration('1min', this)">
+    <div class="tab-icon">⏱️</div>
+    <div class="tab-name">WinGo 1 Min</div>
+  </div>
+  <div class="game-tab" onclick="selectDuration('3min', this)">
+    <div class="tab-icon">⏱️</div>
+    <div class="tab-name">WinGo 3 Min</div>
+  </div>
+  <div class="game-tab" onclick="selectDuration('5min', this)">
+    <div class="tab-icon">⏱️</div>
+    <div class="tab-name">WinGo 5 Min</div>
+  </div>
+</div>
+
+<!-- INFO ROW: LAST RESULTS + TIMER -->
+<div class="info-row">
+  <div class="info-left">
+    <div class="info-title">How to play</div>
+    <div class="last-results" id="lastResults">
+      <!-- Filled by JS -->
+    </div>
+  </div>
+  <div class="info-right">
+    <div class="timer-label">Time remaining</div>
+    <div class="timer-display">
+      <div class="timer-box" id="timerMin">0</div>
+      <div class="timer-box" id="timerMin2">0</div>
+      <span class="timer-sep">:</span>
+      <div class="timer-box" id="timerSec">0</div>
+      <div class="timer-box" id="timerSec2">0</div>
+    </div>
+  </div>
+</div>
+
+<!-- COLOR BUTTONS -->
+<div class="colors-section">
+  <div class="color-btn color-green" id="colorGreen" onclick="selectColor(0)">
+    <span class="color-name">Green</span>
+    <span class="color-mult">2×</span>
+  </div>
+  <div class="color-btn color-violet" id="colorViolet" onclick="selectColor(1)">
+    <span class="color-name">Violet</span>
+    <span class="color-mult">5×</span>
+  </div>
+  <div class="color-btn color-red" id="colorRed" onclick="selectColor(2)">
+    <span class="color-name">Red</span>
+    <span class="color-mult">2×</span>
+  </div>
+</div>
+
+<!-- NUMBER GRID -->
+<div class="numbers-grid" id="numbersGrid">
+  <!-- Filled by JS -->
+</div>
+
+<!-- BET CHIPS -->
+<div class="chips-section" id="chipsSection">
+  <div class="chip active" data-amt="10" onclick="selectChip(10, this)">₹10</div>
+  <div class="chip" data-amt="50" onclick="selectChip(50, this)">₹50</div>
+  <div class="chip" data-amt="100" onclick="selectChip(100, this)">₹100</div>
+  <div class="chip" data-amt="500" onclick="selectChip(500, this)">₹500</div>
+</div>
+
+<!-- PLACE BET -->
+<div class="bet-btn-container">
+  <button class="bet-btn" id="placeBetBtn" onclick="placeBet()">PLACE BET</button>
+</div>
+
+<!-- MESSAGE -->
+<div class="msg-box" id="msgBox">Select color or number & place your bet</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active">
+    <span class="nav-icon">🎮</span>
+    Game
+  </div>
+  <div class="nav-item" onclick="goWallet('deposit')">
+    <span class="nav-icon">💰</span>
+    Wallet
+  </div>
+  <div class="nav-item" onclick="showHistory()">
+    <span class="nav-icon">📊</span>
+    History
+  </div>
+  <div class="nav-item" onclick="logout()">
+    <span class="nav-icon">🚪</span>
+    Logout
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- RESULT OVERLAY -->
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+    <div class="big-num" id="resultNum">0</div>
+    <div class="result-text" id="resultText">Result</div>
+    <div class="result-sub" id="resultSub"></div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ BACKEND URL YAHAN DAALNA (Render deploy ke baad)
+  const API = '';
+
+  // ===== CONFIG =====
+  const COLORS = [
+    { name: 'Green', hex: '#00CC44', mult: 2 },
+    { name: 'Violet', hex: '#8B00FF', mult: 5 },
+    { name: 'Red', hex: '#FF0000', mult: 2 },
+  ];
+  // Number -> color index
+  const NUM_COLOR = {
+    0: 1, // Violet
+    1: 0, // Green
+    2: 2, // Red
+    3: 0, // Green
+    4: 2, // Red
+    5: 1, // Violet
+    6: 2, // Red
+    7: 0, // Green
+    8: 2, // Red
+    9: 0, // Green
+  };
+  const NUM_PAYOUT = 9;
+
+  // ===== STATE =====
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = 'index.html';
+
+  let balance = 0;
+  let username = localStorage.getItem('username') || 'User';
+  let selectedColor = null;
+  let selectedNumber = null;
+  let betAmount = 10;
+  let timerSeconds = 60;
+  let roundActive = true;
+  let betPlaced = false;
+  let timerInterval = null;
+  let pollInterval = null;
+
+  // ===== INIT =====
+  init();
+
+  async function init() {
+    await loadBalance();
+    buildNumbers();
+    await loadLastResults();
+    startTimer();
+    startPolling();
+  }
+
+  // ===== BALANCE =====
+  async function loadBalance() {
+    try {
+      const res = await fetch(`${API}/api/wallet/balance`, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (res.status === 401) { logout(); return; }
+      const data = await res.json();
+      balance = data.balance;
+      document.getElementById('balanceDisplay').textContent = '₹ ' + balance.toFixed(2);
+    } catch (e) {
+      console.log('Balance error:', e);
+    }
+  }
+
+  // ===== BUILD NUMBERS =====
+  function buildNumbers() {
+    const grid = document.getElementById('numbersGrid');
+    grid.innerHTML = '';
+    for (let n = 0; n <= 9; n++) {
+      const colorIdx = NUM_COLOR[n];
+      const colorClass = colorIdx === 0 ? 'num-green' : colorIdx === 1 ? 'num-violet' : 'num-red';
+      const btn = document.createElement('div');
+      btn.className = 'num-btn ' + colorClass;
+      btn.textContent = n;
+      btn.dataset.num = n;
+      btn.onclick = () => selectNumber(n);
+      grid.appendChild(btn);
+    }
+  }
+
+  // ===== SELECT COLOR =====
+  function selectColor(idx) {
+    if (!roundActive || betPlaced) return;
+    selectedColor = (selectedColor === idx) ? null : idx;
+    document.querySelectorAll('.color-btn').forEach((b, i) => {
+      b.classList.toggle('selected', i === idx && selectedColor === idx);
+    });
+    document.querySelectorAll('.num-btn').forEach(b => b.classList.remove('selected'));
+    selectedNumber = null;
+    updateMsg();
+  }
+
+  // ===== SELECT NUMBER =====
+  function selectNumber(n) {
+    if (!roundActive || betPlaced) return;
+    selectedNumber = (selectedNumber === n) ? null : n;
+    document.querySelectorAll('.num-btn').forEach(b => {
+      b.classList.toggle('selected', parseInt(b.dataset.num) === selectedNumber);
+    });
+    document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('selected'));
+    selectedColor = null;
+    updateMsg();
+  }
+
+  // ===== SELECT CHIP =====
+  function selectChip(amt, el) {
+    if (betPlaced) return;
+    betAmount = amt;
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    updateMsg();
+  }
+
+  function updateMsg() {
+    const msg = document.getElementById('msgBox');
+    if (betPlaced) {
+      msg.textContent = 'Bet placed! Wait for result...';
+      return;
+    }
+    if (selectedColor !== null) {
+      msg.textContent = `Selected: ${COLORS[selectedColor].name} (${COLORS[selectedColor].mult}×) | Bet: ₹${betAmount}`;
+    } else if (selectedNumber !== null) {
+      msg.textContent = `Selected: Number ${selectedNumber} (9×) | Bet: ₹${betAmount}`;
+    } else {
+      msg.textContent = 'Select color or number & place your bet';
+    }
+  }
+
+  // ===== PLACE BET =====
+  async function placeBet() {
+    if (!roundActive) { showToast('Round khatam ho gaya, wait karo', 'error'); return; }
+    if (betPlaced) { showToast('Bet already placed', 'error'); return; }
+    if (selectedColor === null && selectedNumber === null) {
+      showToast('Pehle color ya number select karo', 'error'); return;
+    }
+    if (betAmount > balance) {
+      showToast('Balance kam hai', 'error'); return;
+    }
+
+    const btn = document.getElementById('placeBetBtn');
+    btn.disabled = true;
+    btn.textContent = 'Placing...';
+
+    try {
+      const body = { amount: betAmount };
+      if (selectedColor !== null) body.colorIdx = selectedColor;
+      if (selectedNumber !== null) body.number = selectedNumber;
+
+      const res = await fetch(`${API}/api/game/bet`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Bet failed', 'error');
+        btn.disabled = false;
+        btn.textContent = 'PLACE BET';
+        return;
+      }
+
+      betPlaced = true;
+      balance = data.balance;
+      document.getElementById('balanceDisplay').textContent = '₹ ' + balance.toFixed(2);
+      showToast('Bet placed successfully!', 'success');
+      updateMsg();
+
+    } catch (e) {
+      showToast('Server error', 'error');
+      btn.disabled = false;
+      btn.textContent = 'PLACE BET';
+    }
+  }
+
+  // ===== TIMER =====
+  function startTimer() {
+    timerSeconds = 60;
+    updateTimerDisplay();
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      timerSeconds--;
+      if (timerSeconds < 0) timerSeconds = 60;
+      updateTimerDisplay();
+      if (timerSeconds === 0) {
+        // New round
+        roundActive = true;
+        betPlaced = false;
+        selectedColor = null;
+        selectedNumber = null;
+        document.querySelectorAll('.color-btn, .num-btn').forEach(b => b.classList.remove('selected'));
+        document.getElementById('placeBetBtn').disabled = false;
+        document.getElementById('placeBetBtn').textContent = 'PLACE BET';
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    const mStr = String(m).padStart(2, '0');
+    const sStr = String(s).padStart(2, '0');
+    document.getElementById('timerMin').textContent = mStr[0];
+    document.getElementById('timerMin2').textContent = mStr[1];
+    document.getElementById('timerSec').textContent = sStr[0];
+    document.getElementById('timerSec2').textContent = sStr[1];
+  }
+
+  // ===== LAST RESULTS =====
+  async function loadLastResults() {
+    try {
+      const res = await fetch(`${API}/api/game/results`);
+      const data = await res.json();
+      renderLastResults(data);
+    } catch (e) {
+      // Default empty
+      renderLastResults([]);
+    }
+  }
+
+  function renderLastResults(results) {
+    const el = document.getElementById('lastResults');
+    el.innerHTML = '';
+    if (!results || results.length === 0) {
+      // Show dummy dots
+      for (let i = 0; i < 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'result-dot';
+        dot.style.background = '#ccc';
+        dot.textContent = '-';
+        el.appendChild(dot);
+      }
+      return;
+    }
+    results.slice(0, 5).forEach(r => {
+      const colorIdx = NUM_COLOR[r.number];
+      const dot = document.createElement('div');
+      dot.className = 'result-dot';
+      dot.style.background = COLORS[colorIdx].hex;
+      dot.textContent = r.number;
+      el.appendChild(dot);
+    });
+  }
+
+  // ===== POLLING (result check) =====
+  function startPolling() {
+    if (pollInterval) clearInterval(pollInterval);
+    pollInterval = setInterval(async () => {
+      if (betPlaced) {
+        // Check result
+        try {
+          const res = await fetch(`${API}/api/game/last-result`, {
+            headers: { Authorization: 'Bearer ' + token }
+          });
+          const data = await res.json();
+          if (data && data.showResult) {
+            showResultOverlay(data.number, data.won, data.winAmount);
+            betPlaced = false;
+            loadBalance();
+            loadLastResults();
+          }
+        } catch (e) {}
+      }
+    }, 3000);
+  }
+
+  function showResultOverlay(num, won, winAmount) {
+    const overlay = document.getElementById('resultOverlay');
+    const numEl = document.getElementById('resultNum');
+    const textEl = document.getElementById('resultText');
+    const subEl = document.getElementById('resultSub');
+    const colorIdx = NUM_COLOR[num];
+    numEl.style.background = COLORS[colorIdx].hex;
+    numEl.textContent = num;
+    if (won) {
+      textEl.textContent = '🎉 You Won!';
+      textEl.style.color = '#00c853';
+      subEl.textContent = '+' + winAmount + ' coins';
+    } else {
+      textEl.textContent = '😢 Better luck next time';
+      textEl.style.color = '#ff4757';
+      subEl.textContent = '';
+    }
+    overlay.classList.add('show');
+    setTimeout(() => overlay.classList.remove('show'), 2500);
+  }
+
+  // ===== DURATION TABS =====
+  function selectDuration(dur, el) {
+    document.querySelectorAll('.game-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+    // Demo: 1min = 60s, 3min = 180s, 5min = 300s
+    // Abhi simple rakhte hain, backend round sync karega
+    showToast('Duration: ' + dur, 'success');
+  }
+
+  // ===== WALLET =====
+  function goWallet(action) {
+    window.location.href = 'wallet.html?action=' + action;
+  }
+
+  // ===== HISTORY =====
+  function showHistory() {
+    showToast('History coming soon', 'success');
+  }
+
+  // ===== LOGOUT =====
+  function logout() {
+    if (confirm('Logout karna hai?')) {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  }
+
+  // ===== TOAST =====
+  let toastTimer;
+  function showToast(text, type) {
+    const t = document.getElementById('toast');
+    t.textContent = text;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+
+</body>
+  </html>
