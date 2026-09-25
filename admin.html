@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Admin Panel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: #0a0018;
+    color: #fff;
+    min-height: 100vh;
+    padding-bottom: 20px;
+  }
+
+  /* ===== LOGIN BOX ===== */
+  .login-box {
+    max-width: 400px;
+    margin: 60px auto 20px;
+    background: linear-gradient(180deg, #1a0033, #0a0018);
+    border: 1px solid #330066;
+    border-radius: 16px;
+    padding: 30px 25px;
+    box-shadow: 0 0 40px rgba(150, 0, 255, 0.3);
+  }
+  .login-box h1 {
+    text-align: center;
+    font-size: 22px;
+    margin-bottom: 25px;
+    background: linear-gradient(90deg, #ff0000, #ff7f00, #ffff00, #00ff00, #0000ff, #4b0082, #8b00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .login-box input {
+    width: 100%;
+    padding: 14px 16px;
+    margin-bottom: 12px;
+    background: #150030;
+    border: 2px solid #440080;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 15px;
+  }
+  .login-box input:focus {
+    outline: none;
+    border-color: #aa66ff;
+  }
+  .login-box button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(90deg, #6600cc, #aa00ff);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    cursor: pointer;
+    margin-top: 8px;
+    box-shadow: 0 4px 20px rgba(150, 0, 255, 0.4);
+  }
+  .login-box button:disabled { background: #333; box-shadow: none; cursor: not-allowed; }
+  .error-msg {
+    color: #ff5577;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 15px;
+    min-height: 18px;
+    font-weight: 600;
+  }
+
+  /* ===== PANEL ===== */
+  .panel { display: none; }
+  .panel.show { display: block; }
+
+  .top-header {
+    background: linear-gradient(135deg, #330066, #1a0033);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #440080;
+  }
+  .top-header .title {
+    font-size: 18px;
+    font-weight: 800;
+    color: #cc88ff;
+  }
+  .top-header .logout-btn {
+    background: transparent;
+    border: 1px solid #ff5577;
+    color: #ff5577;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  /* ===== TABS ===== */
+  .tabs-row {
+    display: flex;
+    gap: 6px;
+    padding: 15px;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    flex-shrink: 0;
+    padding: 10px 18px;
+    background: #150030;
+    border: 1px solid #440080;
+    color: #aa88cc;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab-btn.active {
+    background: #6600cc;
+    color: #fff;
+    border-color: #aa66ff;
+    box-shadow: 0 0 15px rgba(150, 0, 255, 0.5);
+  }
+
+  .tab-content { display: none; padding: 0 15px; }
+  .tab-content.active { display: block; }
+
+  /* ===== STATS CARDS ===== */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .stat-card {
+    background: linear-gradient(135deg, #1a0033, #0a0018);
+    border: 1px solid #440080;
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+  }
+  .stat-card .stat-icon { font-size: 22px; margin-bottom: 6px; }
+  .stat-card .stat-value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #cc88ff;
+    margin-bottom: 4px;
+  }
+  .stat-card .stat-label {
+    font-size: 11px;
+    color: #aa88cc;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* ===== USER / TX CARDS ===== */
+  .list-card {
+    background: linear-gradient(135deg, #1a0033, #0a0018);
+    border: 1px solid #440080;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 12px;
+  }
+  .list-item {
+    padding: 12px 0;
+    border-bottom: 1px solid #330066;
+    font-size: 13px;
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+  }
+  .list-row .name { font-weight: 700; color: #fff; }
+  .list-row .value { color: #cc88ff; font-weight: 700; }
+  .list-row .meta { font-size: 11px; color: #8866aa; }
+  .action-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+  }
+  .btn-sm {
+    padding: 7px 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+  }
+  .btn-credit { background: #00a035; }
+  .btn-debit { background: #cc5500; }
+  .btn-block { background: #cc0055; }
+  .btn-unblock { background: #0099cc; }
+  .btn-approve { background: #00a035; }
+  .btn-reject { background: #cc0055; }
+
+  .empty-msg {
+    text-align: center;
+    padding: 30px 10px;
+    color: #8866aa;
+    font-size: 13px;
+  }
+
+  .refresh-btn {
+    width: 100%;
+    padding: 12px;
+    background: #330066;
+    border: 1px solid #6600cc;
+    color: #cc88ff;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    margin-bottom: 15px;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.3s;
+    z-index: 999;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #00c853; }
+  .toast.error { background: #ff4757; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN BOX -->
+<div class="login-box" id="loginBox">
+  <h1>🔐 Admin Panel</h1>
+  <input type="text" id="adminUser" placeholder="Admin Username" autocomplete="off">
+  <input type="password" id="adminPass" placeholder="Password">
+  <input type="password" id="adminKey" placeholder="Secret Key">
+  <button id="loginBtn" onclick="adminLogin()">LOGIN</button>
+  <div class="error-msg" id="loginError"></div>
+</div>
+
+<!-- PANEL -->
+<div class="panel" id="panel">
+  <div class="top-header">
+    <div class="title">⚡ Admin Panel</div>
+    <button class="logout-btn" onclick="adminLogout()">Logout</button>
+  </div>
+
+  <div class="tabs-row">
+    <div class="tab-btn active" onclick="showTab('statsTab', this)">📊 Stats</div>
+    <div class="tab-btn" onclick="showTab('usersTab', this)">👥 Users</div>
+    <div class="tab-btn" onclick="showTab('pendingTab', this)">⏳ Pending</div>
+    <div class="tab-btn" onclick="showTab('betsTab', this)">🎮 Recent Bets</div>
+  </div>
+
+  <!-- STATS TAB -->
+  <div class="tab-content active" id="statsTab">
+    <button class="refresh-btn" onclick="loadStats()">🔄 Refresh Stats</button>
+    <div class="stats-grid" id="statsGrid"></div>
+  </div>
+
+  <!-- USERS TAB -->
+  <div class="tab-content" id="usersTab">
+    <button class="refresh-btn" onclick="loadUsers()">🔄 Refresh Users</button>
+    <div class="list-card" id="usersList">
+      <div class="empty-msg">Loading...</div>
+    </div>
+  </div>
+
+  <!-- PENDING TAB -->
+  <div class="tab-content" id="pendingTab">
+    <button class="refresh-btn" onclick="loadPending()">🔄 Refresh Pending</button>
+    <div class="list-card" id="pendingList">
+      <div class="empty-msg">Loading...</div>
+    </div>
+  </div>
+
+  <!-- BETS TAB -->
+  <div class="tab-content" id="betsTab">
+    <button class="refresh-btn" onclick="loadBets()">🔄 Refresh Bets</button>
+    <div class="list-card" id="betsList">
+      <div class="empty-msg">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ⚠️ BACKEND URL YAHAN DAALNA
+  const API = '';
+
+  let adminToken = localStorage.getItem('adminToken') || '';
+
+  // If already logged in
+  if (adminToken) {
+    showPanel();
+  }
+
+  // ===== ADMIN LOGIN =====
+  async function adminLogin() {
+    const username = document.getElementById('adminUser').value.trim();
+    const password = document.getElementById('adminPass').value;
+    const secretKey = document.getElementById('adminKey').value.trim();
+    const errEl = document.getElementById('loginError');
+    const btn = document.getElementById('loginBtn');
+
+    errEl.textContent = '';
+
+    if (!username || !password || !secretKey) {
+      errEl.textContent = 'Teen cheezein daalo: username, password, secret key';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Logging in...';
+
+    try {
+      const res = await fetch(`${API}/api/admin/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, secretKey })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errEl.textContent = data.error || 'Login failed';
+        btn.disabled = false;
+        btn.textContent = 'LOGIN';
+        return;
+      }
+
+      adminToken = data.token;
+      localStorage.setItem('adminToken', adminToken);
+      showPanel();
+
+    } catch (e) {
+      errEl.textContent = 'Server error';
+      btn.disabled = false;
+      btn.textContent = 'LOGIN';
+    }
+  }
+
+  function showPanel() {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('panel').classList.add('show');
+    loadStats();
+    loadUsers();
+    loadPending();
+    loadBets();
+  }
+
+  function adminLogout() {
+    if (confirm('Logout karna hai?')) {
+      localStorage.removeItem('adminToken');
+      adminToken = '';
+      location.reload();
+    }
+  }
+
+  // ===== API HELPER =====
+  async function api(path, opts = {}) {
+    const res = await fetch(`${API}/api/admin${path}`, {
+      ...opts,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + adminToken,
+        ...(opts.headers || {})
+      }
+    });
+    if (res.status === 401 || res.status === 403) {
+      showToast('Session expired. Please login again.', 'error');
+      localStorage.removeItem('adminToken');
+      setTimeout(() => location.reload(), 1500);
+      throw new Error('Unauthorized');
+    }
+    return res;
+  }
+
+  // ===== TABS =====
+  function showTab(tabId, el) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+  }
+
+  // ===== STATS =====
+  async function loadStats() {
+    try {
+      const res = await api('/stats');
+      const data = await res.json();
+      const grid = document.getElementById('statsGrid');
+      grid.innerHTML = `
+        <div class="stat-card">
+          <div class="stat-icon">👥</div>
+          <div class="stat-value">${data.totalUsers || 0}</div>
+          <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🎮</div>
+          <div class="stat-value">${data.totalBets || 0}</div>
+          <div class="stat-label">Total Bets</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-value">₹${(data.totalBetAmount || 0).toFixed(0)}</div>
+          <div class="stat-label">Bet Volume</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-value">₹${(data.totalPayout || 0).toFixed(0)}</div>
+          <div class="stat-label">Total Payout</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">📈</div>
+          <div class="stat-value" style="color:${data.profit >= 0 ? '#00ff88' : '#ff5577'}">₹${(data.profit || 0).toFixed(0)}</div>
+          <div class="stat-label">Platform Profit</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-value">${data.pendingTx || 0}</div>
+          <div class="stat-label">Pending Requests</div>
+        </div>
+      `;
+    } catch (e) { console.log(e); }
+  }
+
+  // ===== USERS =====
+  async function loadUsers() {
+    try {
+      const res = await api('/users');
+      const users = await res.json();
+      const el = document.getElementById('usersList');
+      if (!users.length) {
+        el.innerHTML = '<div class="empty-msg">No users yet</div>';
+        return;
+      }
+      el.innerHTML = '';
+      users.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        const date = new Date(u.createdAt).toLocaleDateString('en-IN');
+        item.innerHTML = `
+          <div class="list-row">
+            <span class="name">${u.username} ${u.isBlocked ? '🚫' : '✅'}</span>
+            <span class="value">₹${u.balance.toFixed(2)}</span>
+          </div>
+          <div class="list-row">
+            <span class="meta">Joined: ${date}</span>
+            <span class="meta">ID: ${u._id.slice(-6)}</span>
+          </div>
+          <div class="action-row">
+            <button class="btn-sm btn-credit" onclick="creditUser('${u._id}', '${u.username}')">+ Credit</button>
+            <button class="btn-sm btn-debit" onclick="debitUser('${u._id}', '${u.username}')">- Debit</button>
+            <button class="btn-sm ${u.isBlocked ? 'btn-unblock' : 'btn-block'}" onclick="toggleBlock('${u._id}', ${!u.isBlocked})">${u.isBlocked ? 'Unblock' : 'Block'}</button>
+          </div>
+        `;
+        el.appendChild(item);
+      });
+    } catch (e) {
+      document.getElementById('usersList').innerHTML = '<div class="empty-msg">Error loading users</div>';
+    }
+  }
+
+  async function creditUser(id, uname) {
+    const amt = prompt(`Kitna credit karna hai ${uname} ko?`);
+    if (!amt || isNaN(amt) || amt <= 0) return;
+    const note = prompt('Note (optional):') || 'Admin credit';
+    try {
+      await api(`/user/${id}/balance`, {
+        method: 'POST',
+        body: JSON.stringify({ amount: parseFloat(amt), note })
+      });
+      showToast(`✅ ₹${amt} credited to ${uname}`, 'success');
+      loadUsers();
+      loadStats();
+    } catch (e) {}
+  }
+
+  async function debitUser(id, uname) {
+    const amt = prompt(`Kitna debit karna hai ${uname} se?`);
+    if (!amt || isNaN(amt) || amt <= 0) return;
+    const note = prompt('Note (optional):') || 'Admin debit';
+    try {
+      await api(`/user/${id}/balance`, {
+        method: 'POST',
+        body: JSON.stringify({ amount: -parseFloat(amt), note })
+      });
+      showToast(`✅ ₹${amt} debited from ${uname}`, 'success');
+      loadUsers();
+      loadStats();
+    } catch (e) {}
+  }
+
+  async function toggleBlock(id, block) {
+    if (!confirm(block ? 'User ko block karna hai?' : 'User ko unblock karna hai?')) return;
+    try {
+      await api(`/user/${id}/block`, {
+        method: 'POST',
+        body: JSON.stringify({ block })
+      });
+      showToast(block ? '🚫 User blocked' : '✅ User unblocked', 'success');
+      loadUsers();
+    } catch (e) {}
+  }
+
+  // ===== PENDING =====
+  async function loadPending() {
+    try {
+      const res = await api('/pending');
+      const txs = await res.json();
+      const el = document.getElementById('pendingList');
+      if (!txs.length) {
+        el.innerHTML = '<div class="empty-msg">No pending requests</div>';
+        return;
+      }
+      el.innerHTML = '';
+      txs.forEach(tx => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        const date = new Date(tx.createdAt).toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+        });
+        item.innerHTML = `
+          <div class="list-row">
+            <span class="name">${tx.userId?.username || 'Unknown'}</span>
+            <span class="value">₹${tx.amount}</span>
+          </div>
+          <div class="list-row">
+            <span class="meta">${tx.type.toUpperCase()}</span>
+            <span class="meta">${date}</span>
+          </div>
+          ${tx.note ? `<div class="list-row"><span class="meta">Note: ${tx.note}</span></div>` : ''}
+          <div class="action-row">
+            <button class="btn-sm btn-approve" onclick="txAction('${tx._id}', 'approve')">✅ Approve</button>
+            <button class="btn-sm btn-reject" onclick="txAction('${tx._id}', 'reject')">❌ Reject</button>
+          </div>
+        `;
+        el.appendChild(item);
+      });
+    } catch (e) {
+      document.getElementById('pendingList').innerHTML = '<div class="empty-msg">Error loading</div>';
+    }
+  }
+
+  async function txAction(id, action) {
+    if (!confirm(`${action === 'approve' ? 'Approve' : 'Reject'} karna hai?`)) return;
+    try {
+      await api(`/transaction/${id}`, {
+        method: 'POST',
+        body: JSON.stringify({ action })
+      });
+      showToast(action === 'approve' ? '✅ Approved' : '❌ Rejected', 'success');
+      loadPending();
+      loadUsers();
+      loadStats();
+    } catch (e) {}
+  }
+
+  // ===== BETS =====
+  async function loadBets() {
+    try {
+      const res = await api('/recent-bets');
+      const bets = await res.json();
+      const el = document.getElementById('betsList');
+      if (!bets.length) {
+        el.innerHTML = '<div class="empty-msg">No bets yet</div>';
+        return;
+      }
+      el.innerHTML = '';
+      bets.forEach(b => {
+        const item = document.createElement('div');
+        item.className = 'list-item';
+        const date = new Date(b.createdAt).toLocaleString('en-IN', {
+          day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+        });
+        const betDesc = b.betType === 'color'
+          ? `Color: ${b.betValue}`
+          : `Number: ${b.betValue}`;
+        item.innerHTML = `
+          <div class="list-row">
+            <span class="name">${b.userId?.username || 'User'}</span>
+            <span class="value" style="color:${b.won ? '#00ff88' : '#ff5577'}">${b.won ? '+' : '-'}₹${b.amount}</span>
+          </div>
+          <div class="list-row">
+            <span class="meta">${betDesc}</span>
+            <span class="meta">Result: ${b.result?.number} (${b.result?.color})</span>
+          </div>
+          <div class="list-row">
+            <span class="meta">${date}</span>
+            <span class="meta">${b.won ? '🏆 Won ₹' + b.payout : '😢 Lost'}</span>
+          </div>
+        `;
+        el.appendChild(item);
+      });
+    } catch (e) {
+      document.getElementById('betsList').innerHTML = '<div class="empty-msg">Error loading</div>';
+    }
+  }
+
+  // ===== TOAST =====
+  let toastTimer;
+  function showToast(text, type) {
+    const t = document.getElementById('toast');
+    t.textContent = text;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+
+</body>
+</html>
