@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Rainbow Game - Login</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(180deg, #4a6cf7 0%, #3b5bdb 40%, #f5f6fa 40%, #f5f6fa 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+  }
+
+  .logo-area {
+    text-align: center;
+    margin: 40px 0 30px;
+    color: #fff;
+  }
+  .logo-icon {
+    font-size: 60px;
+    margin-bottom: 10px;
+  }
+  .logo-title {
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  .logo-sub {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-top: 5px;
+  }
+
+  .card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 25px 20px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+  }
+
+  .tabs {
+    display: flex;
+    background: #f0f2f7;
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    color: #888;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: #4a6cf7;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(74,108,247,0.3);
+  }
+
+  .input-group {
+    margin-bottom: 15px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 14px 16px;
+    background: #f5f6fa;
+    border: 2px solid #f5f6fa;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #333;
+    transition: all 0.2s;
+  }
+  .input-group input:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    background: #fff;
+  }
+
+  .btn {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(90deg, #4a6cf7, #3b5bdb);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-top: 10px;
+    box-shadow: 0 4px 15px rgba(74,108,247,0.4);
+    transition: all 0.2s;
+  }
+  .btn:active {
+    transform: scale(0.98);
+    box-shadow: 0 2px 8px rgba(74,108,247,0.4);
+  }
+  .btn:disabled {
+    background: #ccc;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .error-msg {
+    color: #ff3b3b;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 18px;
+    font-weight: 500;
+  }
+
+  .success-msg {
+    color: #00a651;
+    font-size: 13px;
+    text-align: center;
+    margin-top: 12px;
+    min-height: 18px;
+    font-weight: 500;
+  }
+
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    margin-top: 20px;
+    padding: 0 20px;
+    line-height: 1.5;
+  }
+
+  .loading {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 6px;
+    vertical-align: middle;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .rainbow-bar {
+    height: 4px;
+    background: linear-gradient(90deg, #8B00FF, #4a6cf7, #00CC44, #FFD700, #FF7F00, #FF0000);
+    border-radius: 2px;
+    margin-bottom: 20px;
+  }
+</style>
+</head>
+<body>
+
+<div class="logo-area">
+  <div class="logo-icon">🌈</div>
+  <div class="logo-title">Rainbow Game</div>
+  <div class="logo-sub">Colour Prediction Platform</div>
+</div>
+
+<div class="card">
+  <div class="rainbow-bar"></div>
+
+  <div class="tabs">
+    <div class="tab active" id="loginTab" onclick="switchMode('login')">Login</div>
+    <div class="tab" id="registerTab" onclick="switchMode('register')">Register</div>
+  </div>
+
+  <div class="input-group">
+    <label>Username</label>
+    <input type="text" id="username" placeholder="Enter username" autocomplete="off" maxlength="20">
+  </div>
+
+  <div class="input-group">
+    <label>Password</label>
+    <input type="password" id="password" placeholder="Enter password" maxlength="30">
+  </div>
+
+  <button class="btn" id="submitBtn" onclick="submitForm()">LOGIN</button>
+
+  <div class="error-msg" id="msg"></div>
+</div>
+
+<div class="footer-note">
+  Demo game with virtual coins only.<br>
+  No real money involved.
+</div>
+
+<script>
+  // ⚠️ BACKEND DEPLOY HONE KE BAAD YAHAN URL DAALNA
+  const API = ''; // Render se URL milega, wahan daalna
+
+  let mode = 'login';
+
+  function switchMode(newMode) {
+    mode = newMode;
+    document.getElementById('loginTab').classList.toggle('active', mode === 'login');
+    document.getElementById('registerTab').classList.toggle('active', mode === 'register');
+    document.getElementById('submitBtn').textContent = mode === 'login' ? 'LOGIN' : 'REGISTER';
+    document.getElementById('msg').textContent = '';
+    document.getElementById('msg').className = 'error-msg';
+  }
+
+  async function submitForm() {
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value;
+    const msgEl = document.getElementById('msg');
+    const btn = document.getElementById('submitBtn');
+
+    msgEl.textContent = '';
+    msgEl.className = 'error-msg';
+
+    if (!username || !password) {
+      msgEl.textContent = 'Username aur password dono daalein';
+      return;
+    }
+    if (username.length < 3) {
+      msgEl.textContent = 'Username kam se kam 3 letters ka ho';
+      return;
+    }
+    if (password.length < 4) {
+      msgEl.textContent = 'Password kam se kam 4 letters ka ho';
+      return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading"></span>' + (mode === 'login' ? 'Logging in...' : 'Creating...');
+
+    try {
+      const res = await fetch(`${API}/api/auth/${mode}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        msgEl.textContent = data.error || 'Kuch galat hua';
+        btn.disabled = false;
+        btn.textContent = mode === 'login' ? 'LOGIN' : 'REGISTER';
+        return;
+      }
+
+      // Save token and user info
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('username', data.username);
+      localStorage.setItem('balance', data.balance);
+
+      msgEl.className = 'success-msg';
+      msgEl.textContent = '✅ Success! Redirecting...';
+
+      setTimeout(() => {
+        window.location.href = 'game.html';
+      }, 500);
+
+    } catch (e) {
+      msgEl.textContent = 'Server se connect nahi ho paaya';
+      btn.disabled = false;
+      btn.textContent = mode === 'login' ? 'LOGIN' : 'REGISTER';
+    }
+  }
+
+  // Enter key se submit
+  document.getElementById('password').addEventListener('keypress', e => {
+    if (e.key === 'Enter') submitForm();
+  });
+  document.getElementById('username').addEventListener('keypress', e => {
+    if (e.key === 'Enter') document.getElementById('password').focus();
+  });
+
+  // Agar already logged in hai, seedha game pe bhejo
+  if (localStorage.getItem('token')) {
+    window.location.href = 'game.html';
+  }
+</script>
+
+</body>
+</html>
