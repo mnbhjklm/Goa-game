@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Wallet - Rainbow Game</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    background: #f5f6fa;
+    color: #333;
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  .back-btn {
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px 10px;
+  }
+  .header-title {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  /* ===== BALANCE CARD ===== */
+  .balance-card {
+    background: linear-gradient(135deg, #4a6cf7, #3b5bdb);
+    color: #fff;
+    padding: 30px 20px;
+    border-radius: 0 0 25px 25px;
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .balance-label {
+    font-size: 13px;
+    opacity: 0.9;
+    margin-bottom: 8px;
+  }
+  .balance-amount {
+    font-size: 42px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+
+  /* ===== TABS ===== */
+  .tabs {
+    display: flex;
+    background: #fff;
+    margin: 0 15px 20px;
+    border-radius: 12px;
+    padding: 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .tab {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 15px;
+    color: #888;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: #4a6cf7;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(74,108,247,0.3);
+  }
+
+  /* ===== FORM CARD ===== */
+  .form-card {
+    background: #fff;
+    margin: 0 15px 20px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .form-card h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+  }
+
+  .input-group {
+    margin-bottom: 15px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .input-group input,
+  .input-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    background: #f5f6fa;
+    border: 2px solid #f5f6fa;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #333;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .input-group input:focus,
+  .input-group textarea:focus {
+    outline: none;
+    border-color: #4a6cf7;
+    background: #fff;
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+  }
+  .quick-amt {
+    flex: 1;
+    min-width: 60px;
+    padding: 10px 0;
+    background: #f0f2f7;
+    border: 2px solid #f0f2f7;
+    border-radius: 20px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 13px;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .quick-amt.active {
+    background: #4a6cf7;
+    border-color: #4a6cf7;
+    color: #fff;
+  }
+
+  .action-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.2s;
+  }
+  .deposit-action {
+    background: linear-gradient(90deg, #00c853, #00a035);
+    box-shadow: 0 4px 15px rgba(0,200,83,0.3);
+  }
+  .withdraw-action {
+    background: linear-gradient(90deg, #ff4757, #cc0000);
+    box-shadow: 0 4px 15px rgba(255,71,87,0.3);
+  }
+  .action-btn:active { transform: scale(0.98); }
+  .action-btn:disabled {
+    background: #ccc;
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  /* ===== INFO BOX ===== */
+  .info-box {
+    background: #fff8e1;
+    border-left: 4px solid #ffc107;
+    padding: 12px 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+    font-size: 12px;
+    color: #856404;
+    line-height: 1.5;
+  }
+
+  /* ===== TRANSACTION HISTORY ===== */
+  .history-card {
+    background: #fff;
+    margin: 0 15px 20px;
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+  .history-card h3 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    color: #333;
+  }
+  .tx-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f2f7;
+  }
+  .tx-item:last-child { border-bottom: none; }
+  .tx-left .tx-type {
+    font-size: 14px;
+    font-weight: 700;
+    color: #333;
+    text-transform: capitalize;
+  }
+  .tx-left .tx-date {
+    font-size: 11px;
+    color: #999;
+    margin-top: 2px;
+  }
+  .tx-right {
+    text-align: right;
+  }
+  .tx-right .tx-amount {
+    font-size: 15px;
+    font-weight: 800;
+  }
+  .tx-right .tx-amount.plus { color: #00c853; }
+  .tx-right .tx-amount.minus { color: #ff4757; }
+  .tx-right .tx-status {
+    font-size: 10px;
+    color: #999;
+    margin-top: 2px;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+  .tx-status.pending { color: #ff9800; }
+  .tx-status.approved { color: #00c853; }
+  .tx-status.rejected { color: #ff4757; }
+  .tx-status.completed { color: #00c853; }
+
+  .empty-msg {
+    text-align: center;
+    padding: 30px 10px;
+    color: #999;
+    font-size: 13px;
+  }
+
+  /* ===== BOTTOM NAV ===== */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    border-top: 1px solid #e0e3eb;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+  }
+  .nav-item {
+    text-align: center;
+    font-size: 11px;
+    color: #999;
+    cursor: pointer;
+    padding: 5px 15px;
+  }
+  .nav-item.active { color: #4a6cf7; }
+  .nav-item .nav-icon {
+    font-size: 20px;
+    display: block;
+    margin-bottom: 2px;
+  }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: #333;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: transform 0.3s;
+    z-index: 999;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #00c853; }
+  .toast.error { background: #ff4757; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="back-btn" onclick="goBack()">←</div>
+  <div class="header-title">Wallet</div>
+</div>
+
+<!-- BALANCE CARD -->
+<div class="balance-card">
+  <div class="balance-label">💰 Available Balance</div>
+  <div class="balance-amount" id="balanceAmount">₹ 0.00</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tabDeposit" onclick="switchTab('deposit')">Deposit</div>
+  <div class="tab" id="tabWithdraw" onclick="switchTab('withdraw')">Withdraw</div>
+</div>
+
+<!-- FORM -->
+<div class="form-card">
+  <h3 id="formTitle">💵 Add Money (Virtual)</h3>
+
+  <div class="info-box">
+    ℹ️ Demo app hai, real money involve nahi hai. Deposit request bhejne par admin approve karega aur coins add ho jayenge.
+  </div>
+
+  <div class="input-group">
+    <label>Amount (₹)</label>
+    <input type="number" id="amountInput" placeholder="Enter amount" min="1">
+  </div>
+
+  <div class="quick-amounts">
+    <div class="quick-amt" onclick="setAmt(100, this)">₹100</div>
+    <div class="quick-amt" onclick="setAmt(500, this)">₹500</div>
+    <div class="quick-amt" onclick="setAmt(1000, this)">₹1000</div>
+    <div class="quick-amt" onclick="setAmt(5000, this)">₹5000</div>
+  </div>
+
+  <div class="input-group">
+    <label>Note (Optional)</label>
+    <input type="text" id="noteInput" placeholder="Any note for admin">
+  </div>
+
+  <button class="action-btn deposit-action" id="actionBtn" onclick="submitRequest()">SUBMIT DEPOSIT REQUEST</button>
+</div>
+
+<!-- TRANSACTION HISTORY -->
+<div class="history-card">
+  <h3>📜 Transaction History</h3>
+  <div id="txHistory">
+    <div class="empty-msg">No transactions yet</div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item" onclick="goGame()">
+    <span class="nav-icon">🎮</span>
+    Game
+  </div>
+  <div class="nav-item active">
+    <span class="nav-icon">💰</span>
+    Wallet
+  </div>
+  <div class="nav-item" onclick="logout()">
+    <span class="nav-icon">🚪</span>
+    Logout
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ⚠️ BACKEND URL YAHAN DAALNA (Render ke baad)
+  const API = '';
+
+  const token = localStorage.getItem('token');
+  if (!token) window.location.href = 'index.html';
+
+  let currentTab = 'deposit';
+  let balance = 0;
+
+  // URL se action check karo
+  const urlParams = new URLSearchParams(window.location.search);
+  const actionFromUrl = urlParams.get('action');
+  if (actionFromUrl === 'withdraw') {
+    switchTab('withdraw');
+  }
+
+  init();
+
+  async function init() {
+    await loadBalance();
+    await loadHistory();
+  }
+
+  // ===== TAB SWITCH =====
+  function switchTab(tab) {
+    currentTab = tab;
+    document.getElementById('tabDeposit').classList.toggle('active', tab === 'deposit');
+    document.getElementById('tabWithdraw').classList.toggle('active', tab === 'withdraw');
+
+    const title = document.getElementById('formTitle');
+    const btn = document.getElementById('actionBtn');
+    const amountInput = document.getElementById('amountInput');
+
+    if (tab === 'deposit') {
+      title.textContent = '💵 Add Money (Virtual)';
+      btn.textContent = 'SUBMIT DEPOSIT REQUEST';
+      btn.className = 'action-btn deposit-action';
+    } else {
+      title.textContent = '💸 Withdraw Money (Virtual)';
+      btn.textContent = 'SUBMIT WITHDRAW REQUEST';
+      btn.className = 'action-btn withdraw-action';
+    }
+    amountInput.value = '';
+    document.getElementById('noteInput').value = '';
+    document.querySelectorAll('.quick-amt').forEach(a => a.classList.remove('active'));
+  }
+
+  // ===== QUICK AMOUNT =====
+  function setAmt(amt, el) {
+    document.getElementById('amountInput').value = amt;
+    document.querySelectorAll('.quick-amt').forEach(a => a.classList.remove('active'));
+    el.classList.add('active');
+  }
+
+  // ===== LOAD BALANCE =====
+  async function loadBalance() {
+    try {
+      const res = await fetch(`${API}/api/wallet/balance`, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (res.status === 401) { logout(); return; }
+      const data = await res.json();
+      balance = data.balance;
+      document.getElementById('balanceAmount').textContent = '₹ ' + balance.toFixed(2);
+    } catch (e) {
+      console.log('Balance error:', e);
+    }
+  }
+
+  // ===== SUBMIT REQUEST =====
+  async function submitRequest() {
+    const amount = parseFloat(document.getElementById('amountInput').value);
+    const note = document.getElementById('noteInput').value.trim();
+
+    if (!amount || amount <= 0) {
+      showToast('Valid amount daalo', 'error');
+      return;
+    }
+
+    if (currentTab === 'withdraw' && amount > balance) {
+      showToast('Balance kam hai', 'error');
+      return;
+    }
+
+    const btn = document.getElementById('actionBtn');
+    btn.disabled = true;
+    btn.textContent = 'Submitting...';
+
+    try {
+      const res = await fetch(`${API}/api/wallet/${currentTab}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token
+        },
+        body: JSON.stringify({ amount, note })
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || 'Request failed', 'error');
+        btn.disabled = false;
+        btn.textContent = currentTab === 'deposit' ? 'SUBMIT DEPOSIT REQUEST' : 'SUBMIT WITHDRAW REQUEST';
+        return;
+      }
+
+      showToast('✅ Request submitted! Admin approve karega', 'success');
+      document.getElementById('amountInput').value = '';
+      document.getElementById('noteInput').value = '';
+      document.querySelectorAll('.quick-amt').forEach(a => a.classList.remove('active'));
+      btn.disabled = false;
+      btn.textContent = currentTab === 'deposit' ? 'SUBMIT DEPOSIT REQUEST' : 'SUBMIT WITHDRAW REQUEST';
+
+      await loadBalance();
+      await loadHistory();
+
+    } catch (e) {
+      showToast('Server error', 'error');
+      btn.disabled = false;
+      btn.textContent = currentTab === 'deposit' ? 'SUBMIT DEPOSIT REQUEST' : 'SUBMIT WITHDRAW REQUEST';
+    }
+  }
+
+  // ===== LOAD HISTORY =====
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${API}/api/wallet/transactions`, {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      const data = await res.json();
+      renderHistory(data);
+    } catch (e) {
+      // Default empty
+      renderHistory([]);
+    }
+  }
+
+  function renderHistory(txs) {
+    const el = document.getElementById('txHistory');
+    if (!txs || txs.length === 0) {
+      el.innerHTML = '<div class="empty-msg">No transactions yet</div>';
+      return;
+    }
+
+    el.innerHTML = '';
+    txs.forEach(tx => {
+      const item = document.createElement('div');
+      item.className = 'tx-item';
+
+      const isCredit = ['deposit', 'win', 'admin_credit'].includes(tx.type);
+      const sign = isCredit ? '+' : '-';
+      const amountClass = isCredit ? 'plus' : 'minus';
+
+      const date = new Date(tx.createdAt).toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
+      });
+
+      item.innerHTML = `
+        <div class="tx-left">
+          <div class="tx-type">${formatType(tx.type)}</div>
+          <div class="tx-date">${date}</div>
+        </div>
+        <div class="tx-right">
+          <div class="tx-amount ${amountClass}">${sign}₹${tx.amount}</div>
+          <div class="tx-status ${tx.status}">${tx.status}</div>
+        </div>
+      `;
+      el.appendChild(item);
+    });
+  }
+
+  function formatType(type) {
+    const map = {
+      'deposit': '💰 Deposit',
+      'withdraw': '💸 Withdraw',
+      'bet': '🎮 Bet',
+      'win': '🏆 Win',
+      'admin_credit': '👤 Admin Credit'
+    };
+    return map[type] || type;
+  }
+
+  // ===== NAVIGATION =====
+  function goBack() { window.location.href = 'game.html'; }
+  function goGame() { window.location.href = 'game.html'; }
+  function logout() {
+    if (confirm('Logout karna hai?')) {
+      localStorage.clear();
+      window.location.href = 'index.html';
+    }
+  }
+
+  // ===== TOAST =====
+  let toastTimer;
+  function showToast(text, type) {
+    const t = document.getElementById('toast');
+    t.textContent = text;
+    t.className = 'toast show ' + (type || '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+
+</body>
+</html>
